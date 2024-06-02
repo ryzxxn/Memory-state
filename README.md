@@ -27,5 +27,19 @@ memoryState.setState('user', { name: 'John', age: 30 });
 
 Get state data:
 ```bash
-npm install memory-state-lib
+// Get state data
+const user = memoryState.getState('user');
+console.log(user); // Output: { name: 'John', age: 30 }
+```
+
+Clear specific state data:
+```bash
+// Clear specific state data
+memoryState.clearState('user');
+```
+
+Clear all state data:
+```bash
+// Clear all state data
+memoryState.clearAll();
 ```
