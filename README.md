@@ -59,3 +59,8 @@ memoryState.clearAll();
 - Security: Since the data stored in MemoryState is transient and exists only within the current session, it may provide better security for sensitive information compared to storing it in browser storage mechanisms that persist across sessions.
 
 - Predictable Behavior: Being a singleton instance, the behavior of MemoryState is predictable and consistent throughout the application. This makes it easier to reason about and debug state-related issues.
+
+## Github Repository
+```Bash
+https://github.com/ryzxxn/memory-state
+```
