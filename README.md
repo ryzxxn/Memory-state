@@ -15,7 +15,7 @@ To use the MemoryState library in your JavaScript application, follow these step
 
 Import the library into your code:
 ```bash
-import memoryState from 'memory-state-lib';
+import memoryState from 'memory-state';
 
 ```
 
