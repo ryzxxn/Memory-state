@@ -27,5 +27,9 @@ class MemoryState {
   const instance = new MemoryState();
   Object.freeze(instance);
   
-  export default instance;
+  
+  // Export for ES Modules (Browsers, React)
+  if (typeof exports !== 'undefined') {
+    exports.default = instance;
+  }
   

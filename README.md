@@ -7,7 +7,7 @@ The MemoryState library provides a simple in-memory state management solution fo
 You can install the MemoryState library via npm:
 
 ```bash
-npm install memory-state-lib
+npm install memory-state
 ```
 
 ## Usage
