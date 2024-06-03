@@ -24,12 +24,12 @@ class MemoryState {
     }
   }
   
-  const instance = new MemoryState();
-  Object.freeze(instance);
+  const memoryState = new MemoryState();
+  Object.freeze(memoryState);
   
   
   // Export for ES Modules (Browsers, React)
   if (typeof exports !== 'undefined') {
-    exports.default = instance;
+    exports.default = memoryState;
   }
   
