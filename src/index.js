@@ -44,16 +44,6 @@ class MemoryState {
       this.listeners[key].forEach((callback) => callback(null));
     });
   }
-
-  onChange(key, callback) {
-    if (!this.listeners[key]) {
-      this.listeners[key] = [];
-    }
-    this.listeners[key].push(callback);
-    return () => {
-      this.listeners[key] = this.listeners[key].filter((cb) => cb !== callback);
-    };
-  }
 }
 
 const memoryState = new MemoryState();
