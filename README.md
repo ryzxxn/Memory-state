@@ -13,37 +13,52 @@ npm install memory-state
 ## Usage
 To use the MemoryState library in your JavaScript application, follow these steps:
 
-Import the library into your code:
+### Import the library into your code:
+Client-Side
 ```bash
 import memoryState from 'memory-state';
-
 ```
-
-Set state data:
+Server-Side
+```javascript
+const memoryState = require('./MemoryState').default;
+```
+### Set state
 ```bash
 // Set state data
 memoryState.setState('user', { name: 'John', age: 30 });
 ```
 
-Get state data:
+### Get state
 ```bash
 // Get state data
 const user = memoryState.getState('user');
 console.log(user); // Output: { name: 'John', age: 30 }
 ```
 
-Clear specific state data:
+### Update state
+```bash
+//Update State
+memoryState.setState('user', { name: 'John', age: 30 });
+```
+
+### Clear state using Key
 ```bash
 // Clear specific state data
 memoryState.clearState('user');
 ```
 
-Clear all state data:
+### Clear all state
 ```bash
 // Clear all state data
 memoryState.clearAll();
 ```
 
+### Subscribe to State Changes
+```bash
+const unsubscribe = memoryState.subscribe('counter', (value) => {
+    console.log('Counter changed:', value);
+});
+```
 ## Limitations:
 - Data Persistence: Unlike browser storage mechanisms like localStorage or sessionStorage, the data stored in MemoryState is transient and exists only within the current execution context of the JavaScript application. It is lost when the application is closed or refreshed.
 
