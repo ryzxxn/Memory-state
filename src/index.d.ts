@@ -1,12 +1,26 @@
-declare module 'memory-state' {
-  interface MemoryState {
-    setState(key: string, value: any): void;
-    getState(key: string): any;
-    clearState(key: string): void;
-    clearAll(): void;
-    subscribe(key: string, callback: (value: any) => void): () => void;
-  }
+type MemoryStateListenerCallback = (value: any) => void;
 
-  const memoryState: MemoryState;
-  export default memoryState;
+declare class MemoryState {
+  private static instance: MemoryState | null;
+  private state: { [key: string]: any };
+  private listeners: { [key: string]: MemoryStateListenerCallback[] };
+  private channel: BroadcastChannel | null;
+
+  private constructor();
+
+  public static getInstance(): MemoryState;
+
+  public setState(key: string, value: any): void;
+
+  public getState(key: string): any;
+
+  public clearState(key: string): void;
+
+  public clearAll(): void;
+
+  public subscribe(key: string, callback: MemoryStateListenerCallback): () => void;
 }
+
+declare const memoryState: MemoryState;
+
+export default memoryState;

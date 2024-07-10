@@ -3,17 +3,20 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const BroadcastChannel = typeof window !== 'undefined' ? window.BroadcastChannel : null;
 class MemoryState {
     constructor() {
+        this.state = {};
+        this.listeners = {};
+        this.channel = null;
+        this.channel = BroadcastChannel ? new BroadcastChannel('memory-state-channel') : null;
+        if (this.channel) {
+            this.channel.addEventListener('message', (event) => {
+                const { key, value } = event.data;
+                this.setState(key, value);
+            });
+        }
+    }
+    static getInstance() {
         if (!MemoryState.instance) {
-            this.state = {};
-            this.listeners = {};
-            this.channel = BroadcastChannel ? new BroadcastChannel('memory-state-channel') : null;
-            if (this.channel) {
-                this.channel.addEventListener('message', (event) => {
-                    const { key, value } = event.data;
-                    this.setState(key, value);
-                });
-            }
-            MemoryState.instance = this;
+            MemoryState.instance = new MemoryState();
         }
         return MemoryState.instance;
     }
@@ -41,7 +44,21 @@ class MemoryState {
             this.listeners[key].forEach((callback) => callback(null));
         });
     }
+    // Subscribe to state changes for a specific key
+    subscribe(key, callback) {
+        if (!this.listeners[key]) {
+            this.listeners[key] = [];
+        }
+        this.listeners[key].push(callback);
+        // Return unsubscribe function
+        return () => {
+            if (this.listeners[key]) {
+                this.listeners[key] = this.listeners[key].filter(cb => cb !== callback);
+            }
+        };
+    }
 }
-const memoryState = new MemoryState();
+MemoryState.instance = null;
+const memoryState = MemoryState.getInstance();
 Object.freeze(memoryState);
 exports.default = memoryState;
