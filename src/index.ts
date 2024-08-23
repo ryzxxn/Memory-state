@@ -8,7 +8,7 @@ class MemoryState {
 
   private constructor() {
     this.channel = BroadcastChannel ? new BroadcastChannel('memory-state-channel') : null;
-    
+
     if (this.channel) {
       this.channel.addEventListener('message', (event) => {
         const { key, value } = event.data;
@@ -65,6 +65,11 @@ class MemoryState {
         this.listeners[key] = this.listeners[key].filter(cb => cb !== callback);
       }
     };
+  }
+
+  // Syntax-friendly subscribe method
+  public on(key: string, callback: (value: any) => void): () => void {
+    return this.subscribe(key, callback);
   }
 }
 

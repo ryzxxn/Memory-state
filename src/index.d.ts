@@ -19,6 +19,8 @@ declare class MemoryState {
   public clearAll(): void;
 
   public subscribe(key: string, callback: MemoryStateListenerCallback): () => void;
+
+  public on(key: string, callback: MemoryStateListenerCallback): () => void;
 }
 
 declare const memoryState: MemoryState;

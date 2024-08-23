@@ -1,85 +1,72 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-
-const BroadcastChannel = typeof window !== 'undefined' ? window.BroadcastChannel : null;
-
-class MemoryState {
-    constructor() {
+var BroadcastChannel = typeof window !== 'undefined' ? window.BroadcastChannel : null;
+var MemoryState = /** @class */ (function () {
+    function MemoryState() {
+        var _this = this;
         this.state = {};
         this.listeners = {};
+        this.channel = null;
         this.channel = BroadcastChannel ? new BroadcastChannel('memory-state-channel') : null;
-
         if (this.channel) {
-            this.channel.addEventListener('message', (event) => {
-                const { key, value } = event.data;
-                this.setState(key, value, false); // false to avoid double notifications
+            this.channel.addEventListener('message', function (event) {
+                var _a = event.data, key = _a.key, value = _a.value;
+                _this.setState(key, value);
             });
         }
     }
-
-    static getInstance() {
+    MemoryState.getInstance = function () {
         if (!MemoryState.instance) {
             MemoryState.instance = new MemoryState();
         }
         return MemoryState.instance;
-    }
-
-    setState(key, value, notify = true) {
+    };
+    MemoryState.prototype.setState = function (key, value) {
         this.state[key] = value;
-
-        if (this.channel && notify) {
-            this.channel.postMessage({ key, value });
+        if (this.channel) {
+            this.channel.postMessage({ key: key, value: value });
         }
-
-        if (notify && this.listeners[key]) {
-            this.listeners[key].forEach((callback) => callback(value));
-        }
-    }
-
-    getState(key) {
-        return this.state[key] || null;
-    }
-
-    clearState(key) {
-        delete this.state[key];
-
         if (this.listeners[key]) {
-            this.listeners[key].forEach((callback) => callback(null));
+            this.listeners[key].forEach(function (callback) { return callback(value); });
         }
-    }
-
-    clearAll() {
+    };
+    MemoryState.prototype.getState = function (key) {
+        return this.state[key] || null;
+    };
+    MemoryState.prototype.clearState = function (key) {
+        delete this.state[key];
+        if (this.listeners[key]) {
+            this.listeners[key].forEach(function (callback) { return callback(null); });
+        }
+    };
+    MemoryState.prototype.clearAll = function () {
+        var _this = this;
         this.state = {};
-
-        Object.keys(this.listeners).forEach((key) => {
-            this.listeners[key].forEach((callback) => callback(null));
+        Object.keys(this.listeners).forEach(function (key) {
+            _this.listeners[key].forEach(function (callback) { return callback(null); });
         });
-    }
-
-    subscribe(key, callback) {
+    };
+    // Subscribe to state changes for a specific key
+    MemoryState.prototype.subscribe = function (key, callback) {
+        var _this = this;
         if (!this.listeners[key]) {
             this.listeners[key] = [];
         }
         this.listeners[key].push(callback);
-
-        // Call the callback with the current state value immediately
-        if (this.state.hasOwnProperty(key)) {
-            callback(this.state[key]);
-        }
-
-        // Return an unsubscribe function
-        return () => {
-            if (this.listeners[key]) {
-                this.listeners[key] = this.listeners[key].filter(cb => cb !== callback);
-                if (this.listeners[key].length === 0) {
-                    delete this.listeners[key];
-                }
+        // Return unsubscribe function
+        return function () {
+            if (_this.listeners[key]) {
+                _this.listeners[key] = _this.listeners[key].filter(function (cb) { return cb !== callback; });
             }
         };
-    }
-}
-
-MemoryState.instance = null;
-const memoryState = MemoryState.getInstance();
+    };
+    // Syntax-friendly subscribe method
+    MemoryState.prototype.on = function (key, callback) {
+        return this.subscribe(key, callback);
+    };
+    MemoryState.instance = null;
+    return MemoryState;
+}());
+var memoryState = MemoryState.getInstance();
 Object.freeze(memoryState);
 exports.default = memoryState;
