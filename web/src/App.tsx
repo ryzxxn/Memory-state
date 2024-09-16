@@ -1,6 +1,5 @@
 import './App.css'
 import CodeBlock from './Components/codeBlock'
-import Documentation from './Components/documentation'
 import Hero from './Components/hero'
 import Navbar from './Components/navabr'
 
@@ -11,9 +10,7 @@ function App() {
     <div className='bg-[rgb(25,25,25)] p-5 h-screen overflow-y-scroll items-center flex flex-col'>
       <Navbar/>
       <Hero/>
-      {/* <p className='text-left text-white text-[1.4rem]'>Documentation</p>
-      <Documentation/> */}
-      <div className='w-full'>
+      <div className='w-full grid grid-cols-2'>
         <CodeBlock/>
       </div>
     </div>
