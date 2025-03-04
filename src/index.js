@@ -1,72 +1,77 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-var BroadcastChannel = typeof window !== 'undefined' ? window.BroadcastChannel : null;
-var MemoryState = /** @class */ (function () {
-    function MemoryState() {
-        var _this = this;
+const BroadcastChannel = typeof window !== 'undefined' ? window.BroadcastChannel : null;
+class MemoryState {
+    constructor() {
         this.state = {};
         this.listeners = {};
         this.channel = null;
         this.channel = BroadcastChannel ? new BroadcastChannel('memory-state-channel') : null;
         if (this.channel) {
-            this.channel.addEventListener('message', function (event) {
-                var _a = event.data, key = _a.key, value = _a.value;
-                _this.setState(key, value);
+            this.channel.addEventListener('message', (event) => {
+                const { key, value, persist } = event.data;
+                this.setState(key, value, persist);
             });
         }
+        // Load persisted state from localStorage on initialization
+        const persistedState = localStorage.getItem('memory-state');
+        if (persistedState) {
+            this.state = JSON.parse(persistedState);
+        }
     }
-    MemoryState.getInstance = function () {
+    static getInstance() {
         if (!MemoryState.instance) {
             MemoryState.instance = new MemoryState();
         }
         return MemoryState.instance;
-    };
-    MemoryState.prototype.setState = function (key, value) {
+    }
+    setState(key, value, persist = false) {
         this.state[key] = value;
         if (this.channel) {
-            this.channel.postMessage({ key: key, value: value });
+            this.channel.postMessage({ key, value, persist });
         }
         if (this.listeners[key]) {
-            this.listeners[key].forEach(function (callback) { return callback(value); });
+            this.listeners[key].forEach((callback) => callback(value));
         }
-    };
-    MemoryState.prototype.getState = function (key) {
+        if (persist) {
+            localStorage.setItem('memory-state', JSON.stringify(this.state));
+        }
+    }
+    getState(key) {
         return this.state[key] || null;
-    };
-    MemoryState.prototype.clearState = function (key) {
+    }
+    clearState(key) {
         delete this.state[key];
         if (this.listeners[key]) {
-            this.listeners[key].forEach(function (callback) { return callback(null); });
+            this.listeners[key].forEach((callback) => callback(null));
         }
-    };
-    MemoryState.prototype.clearAll = function () {
-        var _this = this;
+        localStorage.setItem('memory-state', JSON.stringify(this.state));
+    }
+    clearAll() {
         this.state = {};
-        Object.keys(this.listeners).forEach(function (key) {
-            _this.listeners[key].forEach(function (callback) { return callback(null); });
+        Object.keys(this.listeners).forEach((key) => {
+            this.listeners[key].forEach((callback) => callback(null));
         });
-    };
+        localStorage.removeItem('memory-state');
+    }
     // Subscribe to state changes for a specific key
-    MemoryState.prototype.subscribe = function (key, callback) {
-        var _this = this;
+    subscribe(key, callback) {
         if (!this.listeners[key]) {
             this.listeners[key] = [];
         }
         this.listeners[key].push(callback);
         // Return unsubscribe function
-        return function () {
-            if (_this.listeners[key]) {
-                _this.listeners[key] = _this.listeners[key].filter(function (cb) { return cb !== callback; });
+        return () => {
+            if (this.listeners[key]) {
+                this.listeners[key] = this.listeners[key].filter(cb => cb !== callback);
             }
         };
-    };
+    }
     // Syntax-friendly subscribe method
-    MemoryState.prototype.on = function (key, callback) {
+    on(key, callback) {
         return this.subscribe(key, callback);
-    };
-    MemoryState.instance = null;
-    return MemoryState;
-}());
-var memoryState = MemoryState.getInstance();
+    }
+}
+MemoryState.instance = null;
+const memoryState = MemoryState.getInstance();
 Object.freeze(memoryState);
-exports.default = memoryState;
+export default memoryState;
+//# sourceMappingURL=index.js.map

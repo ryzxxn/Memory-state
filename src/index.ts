@@ -11,9 +11,15 @@ class MemoryState {
 
     if (this.channel) {
       this.channel.addEventListener('message', (event) => {
-        const { key, value } = event.data;
-        this.setState(key, value);
+        const { key, value, persist } = event.data;
+        this.setState(key, value, persist);
       });
+    }
+
+    // Load persisted state from localStorage on initialization
+    const persistedState = localStorage.getItem('memory-state');
+    if (persistedState) {
+      this.state = JSON.parse(persistedState);
     }
   }
 
@@ -24,13 +30,16 @@ class MemoryState {
     return MemoryState.instance;
   }
 
-  public setState(key: string, value: any) {
+  public setState(key: string, value: any, persist: boolean = false) {
     this.state[key] = value;
     if (this.channel) {
-      this.channel.postMessage({ key, value });
+      this.channel.postMessage({ key, value, persist });
     }
     if (this.listeners[key]) {
       this.listeners[key].forEach((callback) => callback(value));
+    }
+    if (persist) {
+      localStorage.setItem('memory-state', JSON.stringify(this.state));
     }
   }
 
@@ -43,6 +52,7 @@ class MemoryState {
     if (this.listeners[key]) {
       this.listeners[key].forEach((callback) => callback(null));
     }
+    localStorage.setItem('memory-state', JSON.stringify(this.state));
   }
 
   public clearAll() {
@@ -50,6 +60,7 @@ class MemoryState {
     Object.keys(this.listeners).forEach((key) => {
       this.listeners[key].forEach((callback) => callback(null));
     });
+    localStorage.removeItem('memory-state');
   }
 
   // Subscribe to state changes for a specific key
