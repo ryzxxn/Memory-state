@@ -1,6 +1,6 @@
 {
   "name": "memory-state",
-  "version": "1.1.15",
+  "version": "1.1.16",
   "description": "",
   "main": "src/index.js",
   "types": "src/index.d.ts",
@@ -14,5 +14,8 @@
     "react-state-management"
   ],
   "author": "eltoncosta",
-  "license": "ISC"
+  "license": "ISC",
+  "devDependencies": {
+    "typescript": "^5.8.2"
+  }
 }

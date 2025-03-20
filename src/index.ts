@@ -11,15 +11,9 @@ class MemoryState {
 
     if (this.channel) {
       this.channel.addEventListener('message', (event) => {
-        const { key, value, persist } = event.data;
-        this.setState(key, value, persist);
+        const { key, value } = event.data;
+        this.setState(key, value);
       });
-    }
-
-    // Load persisted state from localStorage on initialization
-    const persistedState = localStorage.getItem('memory-state');
-    if (persistedState) {
-      this.state = JSON.parse(persistedState);
     }
   }
 
@@ -30,16 +24,13 @@ class MemoryState {
     return MemoryState.instance;
   }
 
-  public setState(key: string, value: any, persist: boolean = false) {
+  public setState(key: string, value: any) {
     this.state[key] = value;
     if (this.channel) {
-      this.channel.postMessage({ key, value, persist });
+      this.channel.postMessage({ key, value });
     }
     if (this.listeners[key]) {
       this.listeners[key].forEach((callback) => callback(value));
-    }
-    if (persist) {
-      localStorage.setItem('memory-state', JSON.stringify(this.state));
     }
   }
 
@@ -52,15 +43,16 @@ class MemoryState {
     if (this.listeners[key]) {
       this.listeners[key].forEach((callback) => callback(null));
     }
-    localStorage.setItem('memory-state', JSON.stringify(this.state));
   }
 
   public clearAll() {
-    this.state = {};
+    // Notify all listeners of null values
     Object.keys(this.listeners).forEach((key) => {
       this.listeners[key].forEach((callback) => callback(null));
     });
-    localStorage.removeItem('memory-state');
+    // Clear both state and listeners
+    this.state = {};
+    this.listeners = {};
   }
 
   // Subscribe to state changes for a specific key
